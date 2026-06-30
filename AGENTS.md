@@ -6,6 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 phxhomeloan.com-2026 — a pnpm monorepo (Turborepo) with a Next.js 16 frontend and Sanity v5 CMS Studio. Uses Biome/Ultracite for linting/formatting.
 
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs are tracked in GitHub Issues for `ovsw/phxhomeloan.com-2026`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Triage uses the default canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repo uses a single-context domain docs layout: root `CONTEXT.md` plus root `docs/adr/` when ADRs exist. See `docs/agents/domain.md`.
+
 ## Commands
 
 ```bash
