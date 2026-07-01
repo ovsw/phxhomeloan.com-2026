@@ -40,3 +40,5 @@ npm-debug.log*
 
 # Claude
 .claude/settings.local.json
+.omp/mcp.json
+.codex/config.toml

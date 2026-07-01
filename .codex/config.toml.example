@@ -1,0 +1,6 @@
+[mcp]
+remote_mcp_client_enabled = true
+
+[mcp_servers.sanity]
+url = "https://mcp.sanity.io"
+http_headers = { Authorization = "Bearer your-token-here" }
