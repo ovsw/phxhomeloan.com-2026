@@ -17,6 +17,71 @@ test.describe("Smoke: static routes", { tag: "@smoke" }, () => {
 });
 
 test.describe("Smoke: dynamic slug pages", { tag: "@smoke" }, () => {
+  test("one CMS page renders with Visual Editing metadata", async ({
+    page,
+    slugPages,
+    baseURL,
+  }) => {
+    const proofPage = slugPages.proofPage;
+
+    expect(
+      proofPage,
+      "Expected at least one Sanity page with page-builder content"
+    ).toBeTruthy();
+
+    if (!proofPage) {
+      throw new Error("Missing Sanity page with page-builder content");
+    }
+
+    const response = await page.goto(`${baseURL}${proofPage}`);
+
+    expect(response?.status()).toBe(200);
+
+    const pageBuilder = page.locator("main[data-sanity]").first();
+    await expect(pageBuilder).toBeVisible();
+    await expect(pageBuilder).toHaveAttribute("data-sanity", /.+/);
+    await expect(pageBuilder.locator("[data-sanity]").first()).toBeVisible();
+  });
+
+  test("draft preview enables the Presentation preview UI", async ({
+    page,
+    slugPages,
+    baseURL,
+  }) => {
+    const previewSecret = process.env.SANITY_E2E_PREVIEW_SECRET;
+    const proofPage = slugPages.proofPage;
+
+    if (!previewSecret) {
+      test.skip(
+        true,
+        "Set SANITY_E2E_PREVIEW_SECRET to a valid Sanity preview URL secret"
+      );
+      return;
+    }
+
+    expect(
+      proofPage,
+      "Expected at least one Sanity page with page-builder content"
+    ).toBeTruthy();
+
+    if (!proofPage) {
+      throw new Error("Missing Sanity page with page-builder content");
+    }
+
+    const draftUrl = new URL("/api/presentation-draft", baseURL);
+    draftUrl.searchParams.set("sanity-preview-secret", previewSecret);
+    draftUrl.searchParams.set("sanity-preview-pathname", proofPage);
+    draftUrl.searchParams.set("sanity-preview-perspective", "drafts");
+
+    await page.goto(draftUrl.toString());
+
+    expect(new URL(page.url()).pathname).toBe(proofPage);
+    await expect(
+      page.getByText("Viewing the website in preview mode.")
+    ).toBeVisible();
+    await expect(page.locator("main[data-sanity]").first()).toBeVisible();
+  });
+
   test("all CMS pages load without errors", async ({
     page,
     slugPages,

@@ -6,7 +6,7 @@ import { defineCliConfig } from "sanity/cli";
 const logger = new Logger("SanityCLI");
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
-const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production-v2";
 // User-application ID used by `sanity deploy`. Generated on the first deploy;
 // set it as SANITY_STUDIO_APP_ID so later deploys target the same app. Replaces
 // the deprecated `studioHost` / *.sanity.studio mechanism.

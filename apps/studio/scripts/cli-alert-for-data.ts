@@ -45,7 +45,7 @@ function printSeedDataImportInstructions() {
     padLine(),
     padLine(`${COLOR_BLUE}Example:${COLOR_RESET}`),
     padLine(
-      `${COLOR_BLUE}${styleCommand("cd apps/studio && npx sanity dataset import seed-data.tar.gz production --replace")}${COLOR_RESET}`
+      `${COLOR_BLUE}${styleCommand("cd apps/studio && npx sanity dataset import seed-data.tar.gz production-v2 --replace")}${COLOR_RESET}`
     ),
     padLine(),
     `└${"─".repeat(BOX_WIDTH)}┘`,

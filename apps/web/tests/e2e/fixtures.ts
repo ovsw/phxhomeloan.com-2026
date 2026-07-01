@@ -4,6 +4,7 @@ import { createClient } from "@sanity/client";
 interface SlugPages {
   pages: string[];
   blogs: string[];
+  proofPage?: string;
 }
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
@@ -30,16 +31,30 @@ function sanitizeSlugs(slugs: string[]): string[] {
   return [...new Set(cleaned)];
 }
 
+function sanitizeSlug(slug: string | null | undefined): string | undefined {
+  if (!(typeof slug === "string" && slug.length > 0)) {
+    return undefined;
+  }
+
+  return slug.endsWith("/") ? slug.slice(0, -1) : slug;
+}
+
 export const test = base.extend<{ slugPages: SlugPages }>({
   slugPages: async ({}, use) => {
     const result = await sanityClient.fetch<SlugPages>(`{
       "pages": *[_type == "page" && defined(slug.current)].slug.current,
-      "blogs": *[_type == "blog" && defined(slug.current)].slug.current
+      "blogs": *[_type == "blog" && defined(slug.current)].slug.current,
+      "proofPage": *[
+        _type == "page" &&
+        defined(slug.current) &&
+        count(pageBuilder[]) > 0
+      ] | order(_updatedAt desc)[0].slug.current
     }`);
 
     await use({
       pages: sanitizeSlugs(result.pages ?? []),
       blogs: sanitizeSlugs(result.blogs ?? []),
+      proofPage: sanitizeSlug(result.proofPage),
     });
   },
 });

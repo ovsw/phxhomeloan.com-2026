@@ -65,10 +65,10 @@ To add sample data programmatically, run the following command:
 
 ```shell
 cd apps/studio
-npx sanity dataset import ./seed-data.tar.gz production --replace
+npx sanity dataset import ./seed-data.tar.gz production-v2 --replace
 ```
 
-This command imports seed content into your Sanity dataset.
+This command imports seed content into the PHX `production-v2` Sanity dataset.
 
 #### 4. Extending the Sanity schema
 

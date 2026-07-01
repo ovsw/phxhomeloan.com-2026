@@ -15,7 +15,7 @@ import { structure } from "@/structure";
 import { getPresentationUrl } from "@/utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
-const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production-v2";
 const title = process.env.SANITY_STUDIO_TITLE;
 
 export default defineConfig({
