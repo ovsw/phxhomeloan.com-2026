@@ -32,7 +32,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.3.2"
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",
