@@ -5,6 +5,11 @@ interface SlugPages {
   pages: string[];
   blogs: string[];
   proofPage?: string;
+  tracerBlog?: {
+    slug: string;
+    title: string;
+    seoDescription?: string | null;
+  };
 }
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
@@ -48,13 +53,29 @@ export const test = base.extend<{ slugPages: SlugPages }>({
         _type == "page" &&
         defined(slug.current) &&
         count(pageBuilder[]) > 0
-      ] | order(_updatedAt desc)[0].slug.current
+      ] | order(_updatedAt desc)[0].slug.current,
+      "tracerBlog": *[
+        _type == "blog" &&
+        migrationSource.id == "266da9e9-a853-41be-949d-c19b35b51cb6" &&
+        slug.current == "/how-much-are-closing-costs-on-a-house"
+      ][0]{
+        "slug": slug.current,
+        title,
+        seoDescription
+      }
     }`);
 
     await use({
       pages: sanitizeSlugs(result.pages ?? []),
       blogs: sanitizeSlugs(result.blogs ?? []),
       proofPage: sanitizeSlug(result.proofPage),
+      tracerBlog: result.tracerBlog
+        ? {
+            ...result.tracerBlog,
+            slug:
+              sanitizeSlug(result.tracerBlog.slug) ?? result.tracerBlog.slug,
+          }
+        : undefined,
     });
   },
 });

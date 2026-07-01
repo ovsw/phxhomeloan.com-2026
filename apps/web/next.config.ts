@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   cacheComponents: true,
   cacheLife: { default: sanity },
+  trailingSlash: true,
   experimental: {
     inlineCss: true,
   },

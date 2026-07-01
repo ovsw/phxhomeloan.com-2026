@@ -1,0 +1,35 @@
+{
+  "tracer": {
+    "sourceDataset": "production",
+    "targetDataset": "production-v2",
+    "sourceId": "266da9e9-a853-41be-949d-c19b35b51cb6",
+    "sourceSlug": "how-much-are-closing-costs-on-a-house",
+    "targetSlug": "/how-much-are-closing-costs-on-a-house",
+    "targetBlogId": "G64sxbfSFKtG9COhwgXMmM"
+  },
+  "counts": {
+    "assetsReused": 2,
+    "assetsUploaded": 0,
+    "authorsCreated": 0,
+    "authorsUpdated": 1,
+    "blogsCreated": 0,
+    "blogsUpdated": 1,
+    "buttonMarks": 1,
+    "categoriesCreated": 0,
+    "categoriesUpdated": 1,
+    "externalLinks": 2,
+    "imageBlocks": 1,
+    "internalLinks": 3,
+    "skippedContent": 0,
+    "tables": 4,
+    "textBlocks": 42,
+    "warnings": 1
+  },
+  "copyIssues": [
+    "Legacy table copy contains \"Morgage\"; preserved as-is."
+  ],
+  "skippedContent": [],
+  "warnings": [
+    "Legacy post had no author reference; reused default Jimmy Vercellino author."
+  ]
+}

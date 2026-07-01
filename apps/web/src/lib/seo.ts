@@ -6,7 +6,7 @@ import { queryGlobalSeoSettings } from "@workspace/sanity/query";
 import type { Metadata } from "next";
 
 import type { Maybe } from "@/types";
-import { capitalize, getBaseUrl } from "@/utils";
+import { capitalize, getBaseUrl, withTrailingSlash } from "@/utils";
 
 // Site-wide configuration interface
 type SiteConfig = {
@@ -84,7 +84,7 @@ function buildPageUrl({
   slug: string;
 }): string {
   const normalizedSlug = slug.startsWith("/") ? slug : `/${slug}`;
-  return `${baseUrl}${normalizedSlug}`;
+  return `${baseUrl}${withTrailingSlash(normalizedSlug)}`;
 }
 
 function extractTitle({

@@ -57,10 +57,17 @@ export const SLUG_WARNING_MESSAGES = {
 const CONFIGS: Record<string, SlugValidationOptions> = {
   blog: {
     documentType: "Blog post",
-    requiredPrefix: "/blog/",
     requireSlash: true,
-    segmentCount: 2,
+    segmentCount: 1,
     sanityDocumentType: "blog",
+    customValidators: [
+      (slug) =>
+        slug === "/blog" || slug.startsWith("/blog/")
+          ? [
+              'Blog posts cannot use the "/blog" path - it is reserved for the blog index',
+            ]
+          : [],
+    ],
   },
   blogIndex: {
     documentType: "Blog index",
@@ -68,6 +75,20 @@ const CONFIGS: Record<string, SlugValidationOptions> = {
     sanityDocumentType: "blogIndex",
     customValidators: [
       (s) => (s !== "/blog" ? ["Blog index must be exactly '/blog'"] : []),
+    ],
+  },
+  category: {
+    documentType: "Category",
+    requireSlash: true,
+    segmentCount: 1,
+    sanityDocumentType: "category",
+    customValidators: [
+      (slug) =>
+        slug === "/blog" || slug.startsWith("/blog/")
+          ? [
+              'Categories cannot use the "/blog" path - it is reserved for blog content',
+            ]
+          : [],
     ],
   },
   homePage: {
@@ -274,7 +295,8 @@ export function generateSlugFromTitle(
     case "author":
       return `/author/${clean}`;
     case "blog":
-      return `/blog/${clean}`;
+    case "category":
+      return `/${clean}`;
     case "page": {
       if (currentSlug?.includes("/")) {
         const segments = currentSlug.split("/").filter(Boolean);

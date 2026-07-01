@@ -63,6 +63,13 @@ const richTextFragment = /* groq */ `
     _type == "image" => {
       ${imageFields},
       "caption": caption
+    },
+    _type == "table" => {
+      title,
+      rows[]{
+        _key,
+        cells[]
+      }
     }
   }
 `;
@@ -85,6 +92,11 @@ const blogCardFragment = /* groq */ `
   orderRank,
   ${imageFragment},
   publishedAt,
+  categories[]->{
+    _id,
+    title,
+    "slug": slug.current
+  },
   ${blogAuthorFragment}
 `;
 
@@ -154,6 +166,10 @@ export const querySlugPagePaths = defineQuery(`
   *[_type == "page" && defined(slug.current)].slug.current
 `);
 
+export const queryRootSlugPaths = defineQuery(`
+  array::unique(*[_type in ["page", "blog"] && defined(slug.current)].slug.current)
+`);
+
 export const queryBlogIndexPageData = defineQuery(`
   *[_type == "blogIndex"][0]{
     ...,
@@ -188,6 +204,11 @@ export const queryBlogSlugPageData = defineQuery(`
     ...,
     "slug": slug.current,
     ${blogAuthorFragment},
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    },
     ${imageFragment},
     ${richTextFragment},
     ${pageBuilderFragment}
@@ -305,7 +326,12 @@ export const querySitemapData = defineQuery(`{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current)]{
+  "blogPages": *[
+    _type == "blog" &&
+    defined(slug.current) &&
+    seoNoIndex != true &&
+    seoHideFromLists != true
+  ]{
     "slug": slug.current,
     "lastModified": _updatedAt
   }

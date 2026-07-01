@@ -83,6 +83,28 @@ export const blog = defineType({
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
+      name: "categories",
+      type: "array",
+      title: "Categories",
+      description:
+        "The educational topics this article belongs to, used for grouping and future category pages",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          to: [
+            {
+              type: "category",
+            },
+          ],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
+      validation: (Rule) => Rule.unique(),
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
       name: "publishedAt",
       type: "date",
       initialValue: () => new Date().toISOString().split("T")[0],
@@ -104,6 +126,48 @@ export const blog = defineType({
       description:
         "The main content of your blog post with text, images, and formatting",
       group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
+      name: "migrationSource",
+      type: "object",
+      title: "Migration Source",
+      description:
+        "Read-only source metadata used to identify and safely rerun migrated articles",
+      readOnly: true,
+      group: GROUP.RELATED,
+      fields: [
+        defineField({
+          name: "dataset",
+          type: "string",
+          title: "Source Dataset",
+          description: "The Sanity dataset this article was migrated from",
+        }),
+        defineField({
+          name: "type",
+          type: "string",
+          title: "Source Type",
+          description: "The legacy document type this article came from",
+        }),
+        defineField({
+          name: "id",
+          type: "string",
+          title: "Source ID",
+          description: "The legacy Sanity document ID for this article",
+        }),
+        defineField({
+          name: "slug",
+          type: "string",
+          title: "Source Slug",
+          description: "The legacy slug before root-path normalization",
+        }),
+        defineField({
+          name: "sourceUpdatedAt",
+          type: "datetime",
+          title: "Source Updated At",
+          description:
+            "The last updated timestamp from the legacy article document",
+        }),
+      ],
     }),
     ...seoFields,
     ...ogFields,

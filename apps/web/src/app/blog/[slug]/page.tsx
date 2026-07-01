@@ -11,14 +11,7 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import {
-  RichText,
-  type RichTextValue,
-} from "@workspace/sanity-blocks/internal/rich-text";
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
-
-import { TableOfContent } from "@/components/elements/table-of-content";
-import { ArticleJsonLd } from "@/components/json-ld";
+import { BlogPostContent } from "@/components/blog-post";
 import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("BlogSlug");
@@ -26,6 +19,15 @@ const logger = new Logger("BlogSlug");
 const PLACEHOLDER_SLUG = "__placeholder__";
 
 type BlogParams = { slug: string };
+
+function getRootBlogSlug(slug: string) {
+  return `/${slug}`;
+}
+
+function getLegacyBlogRouteSlug(slug: string) {
+  const parts = slug.split("/").filter(Boolean);
+  return parts[0] === "blog" ? parts[1] : undefined;
+}
 
 export async function generateStaticParams() {
   try {
@@ -42,11 +44,16 @@ export async function generateStaticParams() {
       if (!slug) {
         continue;
       }
-      const [, , path] = slug.split("/");
+      const path = getLegacyBlogRouteSlug(slug);
       if (path) {
         paths.push({ slug: path });
       }
     }
+
+    if (paths.length === 0) {
+      return [{ slug: PLACEHOLDER_SLUG }];
+    }
+
     return paths;
   } catch (error) {
     logger.error("Error fetching blog paths", error);
@@ -63,7 +70,7 @@ export async function generateMetadata({
     params,
     getDynamicFetchOptions(),
   ]);
-  const slugString = `/blog/${slug}`;
+  const slugString = getRootBlogSlug(slug);
   const { data } = await sanityFetchMetadata({
     query: queryBlogSlugPageData,
     params: { slug: slugString },
@@ -75,6 +82,7 @@ export async function generateMetadata({
     slug: slugString,
     contentId: data?._id,
     contentType: data?._type,
+    seoNoIndex: data?.seoNoIndex,
     pageType: "article",
   });
 }
@@ -123,7 +131,7 @@ async function getCachedBlogPage({
   stega,
 }: BlogParams & DynamicFetchOptions) {
   "use cache";
-  const slugString = `/blog/${slug}`;
+  const slugString = getRootBlogSlug(slug);
   const { data } = await sanityFetch({
     query: queryBlogSlugPageData,
     params: { slug: slugString },
@@ -138,40 +146,7 @@ function BlogPageContent({
 }: {
   data: NonNullable<Awaited<ReturnType<typeof getCachedBlogPage>>>;
 }) {
-  const { title, description, image, richText } = data ?? {};
-
-  return (
-    <div className="container mx-auto my-16 px-4 md:px-6">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
-        <main>
-          <ArticleJsonLd article={data} />
-          <header className="mb-8">
-            <h1 className="mt-2 font-bold text-4xl">{title}</h1>
-            <p className="mt-4 text-lg text-muted-foreground">{description}</p>
-          </header>
-          {image && (
-            <div className="mb-12">
-              <SanityImage
-                alt={title}
-                className="h-auto w-full rounded-lg"
-                height={900}
-                image={image}
-                loading="eager"
-                width={1600}
-              />
-            </div>
-          )}
-          <RichText richText={richText as RichTextValue} />
-        </main>
-
-        <div className="hidden lg:block">
-          <div className="sticky top-4 rounded-lg">
-            <TableOfContent richText={richText ?? []} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <BlogPostContent data={data} />;
 }
 
 function BlogFallback() {

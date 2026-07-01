@@ -51,7 +51,7 @@ export async function isUnique(
 }
 
 export const getDocTypePrefix = (type: string) => {
-  if (["page"].includes(type)) {
+  if (["blog", "category", "page"].includes(type)) {
     return "";
   }
   return type;

@@ -14,6 +14,14 @@ export const getBaseUrl = () => {
   return "http://localhost:3000";
 };
 
+export function withTrailingSlash(path: string): string {
+  if (path === "/" || path.endsWith("/")) {
+    return path;
+  }
+
+  return `${path}/`;
+}
+
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 

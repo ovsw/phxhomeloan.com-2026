@@ -19,7 +19,7 @@ import type {
 } from "schema-dts";
 
 import { getJsonLdSettings } from "@/lib/json-ld-data";
-import { getBaseUrl } from "@/utils";
+import { getBaseUrl, withTrailingSlash } from "@/utils";
 
 type RichTextChild = {
   _type: string;
@@ -139,7 +139,7 @@ export function ArticleJsonLd({
   const article = stegaClean(rawArticle);
 
   const baseUrl = getBaseUrl();
-  const articleUrl = `${baseUrl}${article.slug}`;
+  const articleUrl = `${baseUrl}${withTrailingSlash(article.slug ?? "/")}`;
   const imageUrl = buildSafeImageUrl(article.image);
 
   const articleJsonLd: WithContext<Article> = {

@@ -6,11 +6,16 @@ import {
   sanityFetchMetadata,
   sanityFetchStaticParams,
 } from "@workspace/sanity/live";
-import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
+import {
+  queryBlogSlugPageData,
+  queryRootSlugPaths,
+  querySlugPageData,
+} from "@workspace/sanity/query";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { BlogPostContent } from "@/components/blog-post";
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
 
@@ -23,7 +28,7 @@ type SlugParams = { slug: string[] };
 export async function generateStaticParams() {
   try {
     const { data: slugs } = await sanityFetchStaticParams({
-      query: querySlugPagePaths,
+      query: queryRootSlugPaths,
     });
 
     if (!Array.isArray(slugs) || slugs.length === 0) {
@@ -55,18 +60,28 @@ export async function generateMetadata({
     getDynamicFetchOptions(),
   ]);
   const slugString = `/${slug.join("/")}`;
-  const { data: pageData } = await sanityFetchMetadata({
-    query: querySlugPageData,
-    params: { slug: slugString },
-    perspective,
-  });
+  const [{ data: pageData }, { data: blogData }] = await Promise.all([
+    sanityFetchMetadata({
+      query: querySlugPageData,
+      params: { slug: slugString },
+      perspective,
+    }),
+    sanityFetchMetadata({
+      query: queryBlogSlugPageData,
+      params: { slug: slugString },
+      perspective,
+    }),
+  ]);
+  const routeData = pageData ?? blogData;
 
   return getSEOMetadata({
-    title: pageData?.title ?? pageData?.seoTitle,
-    description: pageData?.description ?? pageData?.seoDescription,
+    title: routeData?.title ?? routeData?.seoTitle,
+    description: routeData?.description ?? routeData?.seoDescription,
     slug: slugString,
-    contentId: pageData?._id,
-    contentType: pageData?._type,
+    contentId: routeData?._id,
+    contentType: routeData?._type,
+    pageType: routeData?._type === "blog" ? "article" : "website",
+    seoNoIndex: routeData?.seoNoIndex,
   });
 }
 
@@ -115,13 +130,21 @@ async function getCachedSlugPage({
 }: SlugParams & DynamicFetchOptions) {
   "use cache";
   const slugString = `/${slug.join("/")}`;
-  const { data: pageData } = await sanityFetch({
-    query: querySlugPageData,
-    params: { slug: slugString },
-    perspective,
-    stega,
-  });
-  return pageData;
+  const [{ data: pageData }, { data: blogData }] = await Promise.all([
+    sanityFetch({
+      query: querySlugPageData,
+      params: { slug: slugString },
+      perspective,
+      stega,
+    }),
+    sanityFetch({
+      query: queryBlogSlugPageData,
+      params: { slug: slugString },
+      perspective,
+      stega,
+    }),
+  ]);
+  return pageData ?? blogData;
 }
 
 function SlugPageContent({
@@ -129,6 +152,10 @@ function SlugPageContent({
 }: {
   pageData: NonNullable<Awaited<ReturnType<typeof getCachedSlugPage>>>;
 }) {
+  if (pageData._type === "blog") {
+    return <BlogPostContent data={pageData} />;
+  }
+
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
   return !Array.isArray(pageBuilder) || pageBuilder?.length === 0 ? (

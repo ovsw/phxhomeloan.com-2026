@@ -16,6 +16,7 @@
     "extract": "sanity schema extract",
     "check-types": "tsc --noEmit",
     "type": "sanity typegen generate",
+    "migrate:closing-costs-tracer": "tsx scripts/migrate-closing-costs-tracer.ts",
     "sync-thumbnails": "node --experimental-strip-types ../../packages/sanity-blocks/scripts/sync-thumbnails.ts --target-root ../../apps/studio/static/thumbnails --file-prefix preview-",
     "postinstall": "sanity exec scripts/cli-alert-for-data.ts && pnpm sync-thumbnails"
   },

@@ -1,4 +1,5 @@
 import { Logger } from "@workspace/logger";
+import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import {
@@ -11,6 +12,16 @@ import slugify from "slugify";
 import { SanityImage } from "./sanity-image";
 
 const logger = new Logger("RichText");
+
+type TableRow = {
+  _key?: string | null;
+  cells?: string[] | null;
+};
+
+type TableValue = {
+  title?: string | null;
+  rows?: TableRow[] | null;
+};
 
 function parseChildrenToSlug(children: PortableTextBlock["children"]): string {
   if (!children) return "";
@@ -84,10 +95,29 @@ const components: Partial<PortableTextReactComponents> = {
           className="underline decoration-dotted underline-offset-2"
           href={value.href}
           prefetch={false}
+          rel={value.openInNewTab ? "noopener noreferrer" : undefined}
           target={value.openInNewTab ? "_blank" : "_self"}
         >
           {children}
         </Link>
+      );
+    },
+    buttonLink: ({ children, value }) => {
+      if (!value.href || value.href === "#") {
+        return <span>Link Broken</span>;
+      }
+
+      return (
+        <Button asChild className="my-2 rounded-[10px]" variant="default">
+          <Link
+            href={value.href}
+            prefetch={false}
+            rel={value.openInNewTab ? "noopener noreferrer" : undefined}
+            target={value.openInNewTab ? "_blank" : "_self"}
+          >
+            {children}
+          </Link>
+        </Button>
       );
     },
   },
@@ -110,6 +140,58 @@ const components: Partial<PortableTextReactComponents> = {
             </figcaption>
           )}
         </figure>
+      );
+    },
+    table: ({ value }: { value: TableValue }) => {
+      const rows = Array.isArray(value?.rows) ? value.rows : [];
+      const validRows = rows.filter(
+        (row) => Array.isArray(row.cells) && row.cells.length > 0
+      );
+
+      if (validRows.length === 0) {
+        return null;
+      }
+
+      const [headerRow, ...bodyRows] = validRows;
+      if (!headerRow) {
+        return null;
+      }
+
+      return (
+        <div className="my-8 overflow-x-auto">
+          <table className="w-full min-w-[40rem] border-collapse text-left text-sm">
+            {value.title && (
+              <caption className="sr-only">{value.title}</caption>
+            )}
+            <thead>
+              <tr>
+                {headerRow.cells?.map((cell, index) => (
+                  <th
+                    className="border border-border bg-muted px-4 py-3 font-semibold"
+                    key={`${headerRow._key ?? "header"}-${index}`}
+                    scope="col"
+                  >
+                    {cell}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bodyRows.map((row, rowIndex) => (
+                <tr key={row._key ?? `row-${rowIndex}`}>
+                  {row.cells?.map((cell, cellIndex) => (
+                    <td
+                      className="border border-border px-4 py-3 align-top"
+                      key={`${row._key ?? rowIndex}-${cellIndex}`}
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       );
     },
   },

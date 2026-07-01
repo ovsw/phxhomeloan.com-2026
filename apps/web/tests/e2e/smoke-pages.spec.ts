@@ -126,4 +126,44 @@ test.describe("Smoke: dynamic slug pages", { tag: "@smoke" }, () => {
       throw new Error(`${failures.length} page(s) failed:\n${report}`);
     }
   });
+
+  test("migrated closing-costs article renders root content and metadata", async ({
+    page,
+    slugPages,
+    baseURL,
+  }) => {
+    const tracerBlog = slugPages.tracerBlog;
+
+    expect(
+      tracerBlog,
+      "Expected the closing-costs tracer blog migration to exist"
+    ).toBeTruthy();
+
+    if (!tracerBlog) {
+      throw new Error("Missing closing-costs tracer blog");
+    }
+
+    const response = await page.goto(`${baseURL}${tracerBlog.slug}/`);
+
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "How Much are Closing Costs"
+    );
+    await expect(
+      page.getByRole("link", { name: "Get Personalized Closing Costs" })
+    ).toBeVisible();
+    await expect(page.getByRole("table").first()).toBeVisible();
+    await expect(page.locator("img").first()).toHaveAttribute(
+      "alt",
+      /closing costs/i
+    );
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      /\/how-much-are-closing-costs-on-a-house\/$/
+    );
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      tracerBlog.seoDescription ?? /closing cost/i
+    );
+  });
 });
