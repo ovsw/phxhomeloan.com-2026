@@ -18,13 +18,13 @@ jobs:
     env:
       SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
       NODE_OPTIONS: "--max_old_space_size=4096"
-      PNPM_VERSION: 10.12.2
-      SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
-      SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
-      SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
-      SANITY_STUDIO_PRESENTATION_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
-      SANITY_STUDIO_PRODUCTION_HOSTNAME: ${{ secrets.SANITY_STUDIO_PRODUCTION_HOSTNAME }}
-      HOST_NAME: ${{ github.head_ref || github.ref_name }}  
+      PNPM_VERSION: 10.32.1
+      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
+      SANITY_STUDIO_TITLE: ${{ vars.SANITY_STUDIO_TITLE }}
+      SANITY_STUDIO_PRESENTATION_URL: ${{ vars.SANITY_STUDIO_PRESENTATION_URL }}
+      SANITY_STUDIO_APP_ID: ${{ vars.SANITY_STUDIO_APP_ID }}
+      HOST_NAME: ${{ github.head_ref || github.ref_name }}
 
     steps:
       - name: Checkout repository
@@ -41,7 +41,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
 
       - name: Install dependencies
